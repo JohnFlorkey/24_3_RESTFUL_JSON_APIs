@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from models import Cupcake, connect_db, db
 
 
@@ -8,6 +8,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 connect_db(app)
+
+
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('index.html')
 
 
 @app.route('/api/cupcakes', methods=['GET'])
@@ -28,7 +33,7 @@ def create_cupcake():
     cupcake.flavor = request.json.get('flavor')
     cupcake.size = request.json.get('size')
     cupcake.rating = request.json.get('rating')
-    cupcake.image = request.json.get('image')
+    cupcake.image = request.json.get('image') if request.json.get('image') else None
 
     db.session.add(cupcake)
     db.session.commit()
