@@ -13,7 +13,6 @@ app.config['TESTING'] = True
 db.drop_all()
 db.create_all()
 
-
 CUPCAKE_DATA = {
     "flavor": "TestFlavor",
     "size": "TestSize",
@@ -107,3 +106,24 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_update_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 200)
+
+            expected_json = CUPCAKE_DATA_2
+            expected_json['id'] = self.cupcake.id
+            self.assertEqual(resp.json['cupcake'], expected_json)
+
+    def test_delete_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+
+            expected_response_json = {"cupcake": f"Successfully deleted cupcake with id = {self.cupcake.id}"}
+            self.assertEqual(resp.json, expected_response_json)
